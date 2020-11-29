@@ -1,0 +1,36 @@
+-------------------------------------------------------------------------------
+Test set: bgu.spl.mics.MessageBusTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 7, Errors: 1, Skipped: 0, Time elapsed: 0.022 s <<< FAILURE! - in bgu.spl.mics.MessageBusTest
+testSubscribeBroadcast  Time elapsed: 0 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testSubscribeBroadcast(MessageBusTest.java:79)
+
+testRegister  Time elapsed: 0 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testRegister(MessageBusTest.java:151)
+
+testComplete  Time elapsed: 0 s  <<< ERROR!
+java.lang.NullPointerException
+	at bgu.spl.mics.MessageBusTest.testComplete(MessageBusTest.java:93)
+
+testUnregister  Time elapsed: 0 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testUnregister(MessageBusTest.java:171)
+
+testSubscribeEvent  Time elapsed: 0 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testSubscribeEvent(MessageBusTest.java:44)
+
+testSendBroadcast  Time elapsed: 0 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testSendBroadcast(MessageBusTest.java:119)
+
+testSendEvent  Time elapsed: 0.012 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: not <null>
+	at bgu.spl.mics.MessageBusTest.testSendEvent(MessageBusTest.java:132)
+
+testAwaitMessage  Time elapsed: 0.002 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unregistered Microservice was received but no exception was sent
+	at bgu.spl.mics.MessageBusTest.testAwaitMessage(MessageBusTest.java:188)
+

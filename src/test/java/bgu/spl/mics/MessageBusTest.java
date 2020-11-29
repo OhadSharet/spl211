@@ -33,42 +33,34 @@ public class MessageBusTest {
         future = new Future<>();
     }
 
-    //No need to test
     @Test
     public void testSubscribeEvent()
     {
-        assertDoesNotThrow(() -> messageBus.sendEvent(null));
         messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"event"});
         event = new ExampleEvent(messageSenderService.getName());
-        assertDoesNotThrow(() -> messageBus.subscribeEvent(event.getClass() , null));
         messageBus.register(eventHandlerService);
-        messageBus.register(messageSenderService);
+        assertNull(messageBus.sendEvent(event));
         messageBus.subscribeEvent(event.getClass(), eventHandlerService);
-        messageBus.sendEvent(event);
+        assertNotNull(messageBus.sendEvent(event));
         Message message = null;
         try {
             message = messageBus.awaitMessage(eventHandlerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("Microservice failed to receive the event");
         }
         assertNotNull(message);
         assertEquals(message, event);
     }
 
-    //No need to test
     @Test
     public void testSubscribeBroadcast() {
-        assertDoesNotThrow(() -> messageBus.sendBroadcast(null));
         messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"broadcast"});
         broadcast = new ExampleBroadcast(messageSenderService.getName());
-        assertDoesNotThrow(() -> messageBus.subscribeBroadcast(broadcast.getClass() , null));
         messageBus.register(firstBroadcastListenerService);
         messageBus.register(secondBroadcastListenerService);
-        messageBus.register(messageSenderService);
         messageBus.subscribeBroadcast(broadcast.getClass(), firstBroadcastListenerService);
         messageBus.subscribeBroadcast(broadcast.getClass(), secondBroadcastListenerService);
-        messageBus.subscribeBroadcast(broadcast.getClass(), messageSenderService);
         messageBus.sendBroadcast(broadcast);
         Message message1 = null;
         Message message2 = null;
@@ -76,13 +68,13 @@ public class MessageBusTest {
             message1 = messageBus.awaitMessage(firstBroadcastListenerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("First microservice failed to receive the broadcast");
         }
         try {
             message2 = messageBus.awaitMessage(secondBroadcastListenerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("Second microservice failed to receive the broadcast");
         }
         assertNotNull(message1);
         assertEquals(message1, broadcast);
@@ -103,13 +95,10 @@ public class MessageBusTest {
 
     @Test
     public void testSendBroadcast() {
-        assertDoesNotThrow(() -> messageBus.sendBroadcast(null));
         messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"broadcast"});
         broadcast = new ExampleBroadcast(messageSenderService.getName());
-        assertDoesNotThrow(() -> messageBus.subscribeBroadcast(broadcast.getClass() , null));
         messageBus.register(firstBroadcastListenerService);
         messageBus.register(secondBroadcastListenerService);
-        messageBus.register(messageSenderService);
         messageBus.subscribeBroadcast(broadcast.getClass(), firstBroadcastListenerService);
         messageBus.subscribeBroadcast(broadcast.getClass(), secondBroadcastListenerService);
         messageBus.sendBroadcast(broadcast);
@@ -119,13 +108,13 @@ public class MessageBusTest {
             message1 = messageBus.awaitMessage(firstBroadcastListenerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("First microservice failed to receive the broadcast");
         }
         try {
             message2 = messageBus.awaitMessage(secondBroadcastListenerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("Second microservice failed to receive the broadcast");
         }
         assertNotNull(message1);
         assertEquals(message1, broadcast);
@@ -135,65 +124,65 @@ public class MessageBusTest {
 
     @Test
     public void testSendEvent() {
-        assertDoesNotThrow(() -> messageBus.sendEvent(null));
         messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"event"});
         event = new ExampleEvent(messageSenderService.getName());
-        assertDoesNotThrow(() -> messageBus.subscribeEvent(event.getClass() , null));
         messageBus.register(eventHandlerService);
-        messageBus.register(messageSenderService);
+        assertNull(messageBus.sendEvent(event));
         messageBus.subscribeEvent(event.getClass(), eventHandlerService);
-        messageBus.sendEvent(event);
+        assertNotNull(messageBus.sendEvent(event));
         Message message = null;
         try {
             message = messageBus.awaitMessage(eventHandlerService);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("Microservice failed to receive the event");
         }
         assertNotNull(message);
         assertEquals(message, event);
     }
 
-    //No need to test
     @Test
     public void testRegister() {
-        assertDoesNotThrow(() -> messageBus.register(null));
+        messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"event"});
+        event = new ExampleEvent(messageSenderService.getName());
         messageBus.register(eventHandlerService);
-        assertEquals(eventHandlerService.getName(), "EventMicroService");
+        messageBus.subscribeEvent(event.getClass(), eventHandlerService);
+        future = messageBus.sendEvent(event);
+        assertNotNull(future);
+        messageBus.unregister(eventHandlerService);
+        future = messageBus.sendEvent(event);
+        assertNull(future);
         try {
             messageBus.unregister(eventHandlerService);
-            assertEquals(eventHandlerService.getName(), "EventMicroService");
+            fail("Unregistered Microservice was received but IllegalStateException wasn't sent");
         }
         catch (IllegalStateException e) {
-            fail("Microservice was registered before unregistered but still an exception was sent");
+            assertTrue(true);
         }
     }
 
-    //No need to test
     @Test
     public void testUnregister() {
+        messageSenderService = new ExampleMessageSenderService("messageSenderService", new String[]{"event"});
+        event = new ExampleEvent(messageSenderService.getName());
+        messageBus.register(eventHandlerService);
+        messageBus.subscribeEvent(event.getClass(), eventHandlerService);
+        future = messageBus.sendEvent(event);
+        assertNotNull(future);
+        messageBus.unregister(eventHandlerService);
+        future = messageBus.sendEvent(event);
+        assertNull(future);
         try {
-            messageBus.unregister(null);
             messageBus.unregister(eventHandlerService);
-            fail("Unregistered Microservice was received but no exception was sent");
+            fail("Unregistered Microservice was received but IllegalStateException wasn't sent");
         }
         catch (IllegalStateException e) {
-            messageBus.register(eventHandlerService);
-            assertEquals(eventHandlerService.getName(), "EventMicroService");
-            messageBus.unregister(eventHandlerService);
-            assertEquals(eventHandlerService.getName(), "EventMicroService");
+            assertTrue(true);
         }
     }
 
     @Test
     public void testAwaitMessage() {
-        try {
-            messageBus.awaitMessage(null);
-            fail("Null Microservice was received but no exception was sent");
-        }
-        catch (IllegalStateException | InterruptedException e) {
-            assertTrue(e instanceof  IllegalStateException);
-        }
         try {
             messageBus.awaitMessage(eventHandlerService);
             fail("Unregistered Microservice was received but no exception was sent");
@@ -205,11 +194,12 @@ public class MessageBusTest {
         event = new ExampleEvent(messageSenderService.getName());
         messageBus.register(eventHandlerService);
         messageBus.subscribeEvent(event.getClass(), eventHandlerService);
+        messageBus.sendEvent(event);
         Message message = null;
         try {
             message = messageBus.awaitMessage(eventHandlerService);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            fail("Microservice failed to receive the event");
         }
         assertNotNull(message);
         assertEquals(message, event);
